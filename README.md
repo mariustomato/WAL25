@@ -13,13 +13,14 @@ This Python script allows users to manually input the outcomes of 500 dice rolls
   - Automatically saves the input with a timestamp into the CSV.
 - Allows correction:
   - Press `ESC` to undo the previous entry.
-- Can be interrupted anytime using `CTRL + C` (saves progress and exits cleanly).
+- Can be exited anytime by pressing `X` (saves progress and exits cleanly).
+- Automatically saves entries into a CSV file in a `data` folder next to the script.
 - Finishes after 500 entries with a "Progress finished" message.
 
 ## Usage
 
 1. **Prepare audio files**  
-   Ensure `A.m4a` and `B.m4a` sound files are located in the same directory as the script.
+   Place `A.m4a` and `B.m4a` sound files in the same directory as the script (not inside `data/`).
 
 2. **Run the script**  
    Use the terminal (not an IDE) to run the program:
@@ -33,6 +34,6 @@ This Python script allows users to manually input the outcomes of 500 dice rolls
      - `A` → for "big"
      - `B` → for "small"
      - `ESC` → to undo the last entry  
-     - `CTRL + C` → to exit the program at any time
+     - `X` → to exit the program at any time
 
 > ⚠️ Note: This program must be run in a real terminal (TTY). It does not work properly in IDE consoles like PyCharm due to raw input requirements.

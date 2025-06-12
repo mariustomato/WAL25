@@ -10,10 +10,12 @@ import tty
 init()
 
 def play_sound(choice):
-    if choice == 'A':
-        os.system('afplay A.m4a &')
-    elif choice == 'B':
-        os.system('afplay B.m4a &')
+    file_name = "A.m4a" if choice == 'A' else "B.m4a"
+    file_path = os.path.join(os.path.dirname(__file__), file_name)
+    if os.path.isfile(file_path):
+        os.system(f'afplay "{file_path}" &')
+    else:
+        print(Fore.RED + f"Audio file not found: {file_path}" + Style.RESET_ALL)
 
 def get_key():
     fd = sys.stdin.fileno()
@@ -37,60 +39,62 @@ def ask_dice_proportions():
 
 def ask_dice_result(throw_id):
     while True:
-        print(f"Throw {throw_id} (A for big, B for small): ", end="", flush=True)
+        print(f"Throw {throw_id} (A for big, B for small, X to exit): ", end="", flush=True)
         key = get_key().upper()
         print()  # move to new line
-        if key == 'A' or key == 'B':
+        if key in ['A', 'B']:
             play_sound(key)
             return key
         elif key == 'ESC':
             return 'ESC'
-        print(Fore.RED + "Invalid input. Only 'A' (big), 'B' (small), or ESC to correct." + Style.RESET_ALL)
+        elif key == 'X':
+            return 'EXIT'
+        print(Fore.RED + "Invalid input. Only 'A', 'B', 'ESC', or 'X' to exit." + Style.RESET_ALL)
 
 def main():
     proportions = ask_dice_proportions()
-    filename = f"diceroll_{proportions}.csv"
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    data_dir = os.path.join(base_path, "data")
+    os.makedirs(data_dir, exist_ok=True)
+    filename = os.path.join(data_dir, f"diceroll_{proportions}.csv")
     file_exists = os.path.isfile(filename)
 
-    data = []
-    if file_exists:
-        with open(filename, mode='r') as file:
-            reader = csv.reader(file)
-            next(reader)
-            data = list(reader)
-
-    with open(filename, mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(["ID", "Result", "Timestamp"])
+    try:
+        data = []
+        if file_exists:
+            with open(filename, mode='r') as file:
+                reader = csv.reader(file)
+                next(reader)
+                data = list(reader)
 
         current_id = len(data)
-        for row in data:
-            writer.writerow(row)
+        while current_id < 500:
+            result = ask_dice_result(current_id + 1)
+            if result == 'EXIT':
+                print(Fore.YELLOW + "Exit command received. Exiting program." + Style.RESET_ALL)
+                break
+            elif result == 'ESC':
+                if current_id > 0:
+                    current_id -= 1
+                    data.pop()
+                continue
 
-        try:
-            while current_id < 500:
-                result = ask_dice_result(current_id + 1)
-                if result == 'ESC':
-                    if current_id > 0:
-                        current_id -= 1
-                        data.pop()
-                        file.seek(0)
-                        file.truncate()
-                        writer.writerow(["ID", "Result", "Timestamp"])
-                        for i, row in enumerate(data):
-                            writer.writerow([i, row[1], row[2]])
-                    continue
+            timestamp = datetime.datetime.now().isoformat()
+            data.append([str(current_id), result, timestamp])
+            current_id += 1
 
-                timestamp = datetime.datetime.now().isoformat()
-                writer.writerow([current_id, result, timestamp])
+            with open(filename, mode='w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(["ID", "Result", "Timestamp"])
+                for row in data:
+                    writer.writerow(row)
                 file.flush()
                 os.fsync(file.fileno())
-                data.append([current_id, result, timestamp])
-                current_id += 1
-        except KeyboardInterrupt:
-            print(Fore.YELLOW + "\nProgram interrupted by user. Exiting." + Style.RESET_ALL)
 
-    print("Progress finished.")
+        if current_id >= 500:
+            print("Progress finished.")
+    except KeyboardInterrupt:
+        print(Fore.YELLOW + "\nProgram interrupted by user. Exiting." + Style.RESET_ALL)
 
 if __name__ == "__main__":
     main()
