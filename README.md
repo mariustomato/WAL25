@@ -13,6 +13,7 @@ This Python script allows users to manually input the outcomes of 500 dice rolls
   - Automatically saves the input with a timestamp into the CSV.
 - Allows correction:
   - Press `ESC` to undo the previous entry.
+- Can be interrupted anytime using `CTRL + C` (saves progress and exits cleanly).
 - Finishes after 500 entries with a "Progress finished" message.
 
 ## Usage
@@ -31,6 +32,7 @@ This Python script allows users to manually input the outcomes of 500 dice rolls
    - For each throw, press:
      - `A` → for "big"
      - `B` → for "small"
-     - `ESC` → to undo the last entry
+     - `ESC` → to undo the last entry  
+     - `CTRL + C` → to exit the program at any time
 
 > ⚠️ Note: This program must be run in a real terminal (TTY). It does not work properly in IDE consoles like PyCharm due to raw input requirements.

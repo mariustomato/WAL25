@@ -67,25 +67,28 @@ def main():
         for row in data:
             writer.writerow(row)
 
-        while current_id < 500:
-            result = ask_dice_result(current_id + 1)
-            if result == 'ESC':
-                if current_id > 0:
-                    current_id -= 1
-                    data.pop()
-                    file.seek(0)
-                    file.truncate()
-                    writer.writerow(["ID", "Result", "Timestamp"])
-                    for i, row in enumerate(data):
-                        writer.writerow([i, row[1], row[2]])
-                continue
+        try:
+            while current_id < 500:
+                result = ask_dice_result(current_id + 1)
+                if result == 'ESC':
+                    if current_id > 0:
+                        current_id -= 1
+                        data.pop()
+                        file.seek(0)
+                        file.truncate()
+                        writer.writerow(["ID", "Result", "Timestamp"])
+                        for i, row in enumerate(data):
+                            writer.writerow([i, row[1], row[2]])
+                    continue
 
-            timestamp = datetime.datetime.now().isoformat()
-            writer.writerow([current_id, result, timestamp])
-            file.flush()
-            os.fsync(file.fileno())
-            data.append([current_id, result, timestamp])
-            current_id += 1
+                timestamp = datetime.datetime.now().isoformat()
+                writer.writerow([current_id, result, timestamp])
+                file.flush()
+                os.fsync(file.fileno())
+                data.append([current_id, result, timestamp])
+                current_id += 1
+        except KeyboardInterrupt:
+            print(Fore.YELLOW + "\nProgram interrupted by user. Exiting." + Style.RESET_ALL)
 
     print("Progress finished.")
 
