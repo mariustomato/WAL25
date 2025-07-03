@@ -10,7 +10,7 @@ import tty
 init()
 
 def play_sound(choice):
-    file_name = "A.m4a" if choice == 'A' else "B.m4a"
+    file_name = "S.m4a" if choice == 'B' else "S.m4a"
     file_path = os.path.join(os.path.dirname(__file__), file_name)
     if os.path.isfile(file_path):
         os.system(f'afplay "{file_path}" &')
@@ -39,20 +39,21 @@ def ask_dice_proportions():
 
 def ask_dice_result(throw_id):
     while True:
-        print(f"Throw {throw_id} (A for big, B for small, X to exit): ", end="", flush=True)
+        print(f"Throw {throw_id}: ", end="", flush=True)
         key = get_key().upper()
         print()  # move to new line
-        if key in ['A', 'B']:
+        if key in ['B', 'S']:
             play_sound(key)
             return key
         elif key == 'ESC':
             return 'ESC'
         elif key == 'X':
             return 'EXIT'
-        print(Fore.RED + "Invalid input. Only 'A', 'B', 'ESC', or 'X' to exit." + Style.RESET_ALL)
+        print(Fore.RED + "Invalid input. Use: B = BIG, S = SMALL, X = Exit, ESC = Previous Input." + Style.RESET_ALL)
 
 def main():
     proportions = ask_dice_proportions()
+    print("B = BIG, S = SMALL, X = Exit, ESC = Previous Input")
     base_path = os.path.dirname(os.path.abspath(__file__))
     data_dir = os.path.join(base_path, "data")
     os.makedirs(data_dir, exist_ok=True)
